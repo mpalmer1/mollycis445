@@ -1,0 +1,104 @@
+1. price * quantity gives value of one product
+Can't do this with find because no mathematical operations, so we have to
+use aggregate.
+
+db.product.aggregate(
+   [
+     { $project: { _id: 0, name: 1, qty: 1, price: 1, value: { $multiply: [ "$qty", "$price" ] } } }
+   ]
+);
+
+2. Unfamilar with mysql but found this online:
+SELECT * FROM product
+WHERE category = "Tools"
+You could do this for each category to get all of the products.
+
+
+3.
+//Selects product name and category name for all products
+db.product.find(
+  {},         
+  { 
+    _id: 0,
+    name : 1,  
+    category: 1
+  }
+);
+
+
+4.
+//Selects all products, categories they belong to, and associated companies
+db.product.find(
+  {},        
+  { 
+    _id: 0,
+    name : 1,  
+    category: 1,
+    company: 1
+  }
+);
+Not all products have the information listed for the category and company name,
+so the query still returns all the products and only shows the attributes that 
+the certain product has.
+
+
+5.
+//First show products made by Stanley
+db.product.find(
+  {},         
+  { 
+    _id: 0,
+    company: 1
+  }
+);
+
+//Updates the two documents below
+db.product.update(
+  { name: "Hammer"},                  
+  { $set: {company: "Stanley Black and Decker"} } 
+);
+
+db.product.update(
+  { name: "32 Piece Ratchet Set"},                  
+  { $set: {company: "Stanley Black and Decker"} }  
+);
+
+
+6.
+//Tools with price greater than 10
+db.product.find({
+  $and : [ 
+    {
+      category: "Tools"
+    },
+    {
+      price: { $gt : 10.00 }
+    }
+  ]
+});
+
+//Tools with price greater than 10 and company: Stanley Black and Decker
+db.product.find({
+  $and : [ 
+    {
+      category: "Tools"
+    },
+    {
+      company: "Stanley Black and Decker"
+    },
+    {
+      price: { $gt : 10.00 }
+    }
+  ]
+});
+
+
+7. 
+//Deletes the company Crest
+db.product.update(
+  { company: "Crest"}, 
+  { $unset: {company: ""} },  
+  { multi:true }     
+);
+I didn't have any problems with this command. It deleted the fields it was
+intended to.
